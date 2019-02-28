@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 const bcrypt = require('bcrypt');
 
@@ -54,7 +55,9 @@ router.post('/login', (req, res, next) => {
 router.post('/signup', (req, res, next) => {
   const {
     username,
-    password
+    password,
+    name,
+    phoneNumber,
   } = req.body;
 
   if (!username || !password) {
@@ -79,6 +82,8 @@ router.post('/signup', (req, res, next) => {
       const newUser = User({
         username,
         password: hashPass,
+        name,
+        phoneNumber,
       });
 
       return newUser.save().then(() => {

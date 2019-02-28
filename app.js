@@ -11,23 +11,23 @@ const cors = require('cors');
 require('dotenv').config();
 
 const auth = require('./routes/auth');
+const api = require('./routes/api');
 
 mongoose.connect(process.env.MONGODB_URI, {
   keepAlive: true,
   useNewUrlParser: true,
-  reconnectTries: Number.MAX_VALUE
+  reconnectTries: Number.MAX_VALUE,
 }).then(() => {
-  console.log(`Connected to database`);
+  console.log('Connected to database');
 }).catch((error) => {
   console.error(error);
-})
-
+});
 
 const app = express();
 
 app.use(cors({
   credentials: true,
-  origin: [process.env.PUBLIC_DOMAIN]
+  origin: [process.env.PUBLIC_DOMAIN],
 }));
 // app.use((req, res, next) => {
 //   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -40,14 +40,14 @@ app.use(cors({
 app.use(session({
   store: new MongoStore({
     mongooseConnection: mongoose.connection,
-    ttl: 24 * 60 * 60 // 1 day
+    ttl: 24 * 60 * 60, // 1 day
   }),
   secret: process.env.SECRET,
   resave: true,
   saveUninitialized: true,
   cookie: {
-    maxAge: 24 * 60 * 60 * 1000
-  }
+    maxAge: 24 * 60 * 60 * 1000,
+  },
 }));
 
 app.use(logger('dev'));
@@ -57,7 +57,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/auth', auth);
-
+app.use('/api', api);
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
   res.status(404).json({ code: 'not found' });

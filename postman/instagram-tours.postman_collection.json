@@ -1,0 +1,154 @@
+{
+	"info": {
+		"_postman_id": "6f07eae3-d783-4a25-8996-22765e85ec40",
+		"name": "instagram-tours",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:5000/auth/signup",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"miguel\",\n\t\"password\": \"test\",\n\t\"name\": \"miguel\",\n\t\"phoneNumber\": \"6456324294\"\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:5000/auth/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"auth",
+						"signup"
+					]
+				},
+				"description": "Create a new User"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/api/book",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3fd1d353-38a5-45c0-a62f-9d775802ed73",
+						"exec": [
+							"const date = new Date(2019, 2, 22).toJSON();",
+							"",
+							"",
+							"pm.globals.set(\"date\", date);",
+							"pm.globals.set(\"buyer\", \"5c7800f0fa2452180b66bd6d\");",
+							"pm.globals.set(\"numberOfTickets\", \"3\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"date\": \"{{date}}\",\n\t\"user\": {\n\t\t\"buyer\":\"{{buyer}}\",\n\t\t\"numberOfTickets\":\"{{numberOfTickets}}\"\n\t}\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/book",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"book"
+					]
+				},
+				"description": "Book a tour"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/api/tours",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/tours",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"tours"
+					]
+				},
+				"description": "Get all tours"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/{{buyer}}/bookedtours",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1bcf9cd0-b2f8-41cd-8468-f37730725e3b",
+						"exec": [
+							"pm.globals.set(\"buyer\", \"5c77ce2a690773146fa9eda7\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/{{buyer}}/bookedtours",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"{{buyer}}",
+						"bookedtours"
+					]
+				},
+				"description": "Get Booked Tours for User ID as param"
+			},
+			"response": []
+		}
+	]
+}
