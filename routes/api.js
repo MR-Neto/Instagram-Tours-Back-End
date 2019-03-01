@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const Tour = require('../models/tour');
 const User = require('../models/user');
+const Place = require('../models/place');
 
 const fullCapacity = 4;
 const price = 25;
@@ -79,6 +80,15 @@ router.get('/:id/bookedtours', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+router.get('/places', (req, res, next) => {
+  Place.find({})
+    .then((places) => {
+      res.status(200);
+      res.json(places);
+    })
+    .catch(next);
 });
 
 module.exports = router;
