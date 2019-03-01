@@ -67,12 +67,12 @@ router.post('/signup', (req, res, next) => {
   }
 
   User.findOne({
-      username
-    }, 'username')
+    username,
+  }, 'username')
     .then((userExists) => {
       if (userExists) {
         return res.status(422).json({
-          error: 'username-not-unique'
+          error: 'username-not-unique',
         });
       }
 
@@ -95,13 +95,13 @@ router.post('/signup', (req, res, next) => {
 });
 
 router.post('/logout', (req, res) => {
-  req.session.destroy()
+  req.session.destroy();
   return res.status(204).send();
 });
 
 router.get('/private', isLoggedIn(), (req, res, next) => {
   res.status(200).json({
-    message: 'This is a private message'
+    message: 'This is a private message',
   });
 });
 

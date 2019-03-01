@@ -149,6 +149,31 @@
 				"description": "Get Booked Tours for User ID as param"
 			},
 			"response": []
+		},
+		{
+			"name": "http://localhost:5000/api/places",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/places",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"places"
+					]
+				},
+				"description": "Get all places from DB."
+			},
+			"response": []
 		}
 	]
 }
