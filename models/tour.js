@@ -22,6 +22,7 @@ const tourSchema = new Schema(
     price: {
       type: Number,
     },
+    isFull: { type: Boolean, default: false },
   },
   {
     timestamps: {

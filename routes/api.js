@@ -5,7 +5,7 @@ const Tour = require('../models/tour');
 const User = require('../models/user');
 const Place = require('../models/place');
 
-const fullCapacity = 4;
+const FULL_CAPACITY = 4;
 const price = 25;
 
 router.get('/tours', (req, res, next) => {
@@ -19,25 +19,33 @@ router.get('/tours', (req, res, next) => {
 
 router.post('/book', async (req, res, next) => {
   const { date, user, places } = req.body;
+  const { buyer, numberOfTickets } = user;
   let updatedTour;
   let createdTour;
 
   try {
     const foundTour = await Tour.find({ date }).populate('users.buyer');
     if (foundTour.length > 0) {
-      const availableSeats = fullCapacity - foundTour[0]
+      const availableSeats = FULL_CAPACITY - foundTour[0]
         .users
         .reduce((acc, currentUser) => acc + Number(currentUser.numberOfTickets), 0);
-      if (availableSeats >= user.numberOfTickets) {
+      const isFull = availableSeats - numberOfTickets <= 0;
+      if (availableSeats >= numberOfTickets) {
         updatedTour = await Tour.findOneAndUpdate({ date },
-          { $push: { users: user } },
+          {
+            $push: { users: user },
+            isFull,
+          },
           { new: true });
       } else {
         res.status(401);
-        res.json(foundTour);
+        res.json({
+          message: 'Not enough seats left',
+          foundTour,
+        });
       }
-    } else {
-      const { buyer, numberOfTickets } = user;
+    } else if (FULL_CAPACITY >= numberOfTickets) {
+      const isFull = numberOfTickets >= FULL_CAPACITY;
       createdTour = await Tour.create({
         date,
         users: [{
@@ -46,6 +54,7 @@ router.post('/book', async (req, res, next) => {
         }],
         places,
         price,
+        isFull,
       });
     }
     res.status(200);
