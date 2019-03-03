@@ -32,7 +32,6 @@ router.post('/book', async (req, res, next) => {
         .reduce((acc, currentUser) => acc + Number(currentUser.numberOfTickets), 0);
       const isFull = availableSeats - numberOfTickets <= 0;
       if (availableSeats >= numberOfTickets) {
-
         // Set your secret key: remember to change this to your live secret key in production
         // See your keys here: https://dashboard.stripe.com/account/apikeys
 
