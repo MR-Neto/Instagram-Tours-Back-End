@@ -25,63 +25,77 @@ router.post('/book', async (req, res, next) => {
   let createdTour;
 
   try {
-    // Set your secret key: remember to change this to your live secret key in production
-    // See your keys here: https://dashboard.stripe.com/account/apikeys
+    const foundTour = await Tour.find({ date }).populate('users.buyer');
+    if (foundTour.length > 0) {
+      const availableSeats = FULL_CAPACITY - foundTour[0]
+        .users
+        .reduce((acc, currentUser) => acc + Number(currentUser.numberOfTickets), 0);
+      const isFull = availableSeats - numberOfTickets <= 0;
+      if (availableSeats >= numberOfTickets) {
 
-    // Token is created using Checkout or Elements!
-    // Get the payment token ID submitted by the form:
-    const { token } = req.body;
-    console.log('token back end', token);
-    const charge = await stripe.charges.create({
-      amount: 999,
-      currency: 'eur',
-      description: 'Example charge',
-      source: 'tok_cvcCheckFail',
-    });
+        // Set your secret key: remember to change this to your live secret key in production
+        // See your keys here: https://dashboard.stripe.com/account/apikeys
 
-    if (charge) {
-      const foundTour = await Tour.find({ date }).populate('users.buyer');
-      if (foundTour.length > 0) {
-        const availableSeats = FULL_CAPACITY - foundTour[0]
-          .users
-          .reduce((acc, currentUser) => acc + Number(currentUser.numberOfTickets), 0);
-        const isFull = availableSeats - numberOfTickets <= 0;
-        if (availableSeats >= numberOfTickets) {
-          updatedTour = await Tour.findOneAndUpdate({ date },
-            {
-              $push: { users: user },
-              isFull,
-            },
-            { new: true });
-        } else {
-          res.status(401);
-          res.json({
-            code: 'Not enough seats left',
-            foundTour,
-          });
-        }
-      } else if (FULL_CAPACITY >= numberOfTickets) {
-        const isFull = numberOfTickets >= FULL_CAPACITY;
-        createdTour = await Tour.create({
-          date,
-          users: [{
-            buyer,
-            numberOfTickets,
-          }],
-          places,
-          price,
-          isFull,
+        // Token is created using Checkout or Elements!
+        // Get the payment token ID submitted by the form:
+        const { token } = req.body;
+        console.log('token back end', token);
+        const charge = await stripe.charges.create({
+          amount: 999,
+          currency: 'eur',
+          description: 'Example charge',
+          source: 'tok_cvcCheckFail',
+        });
+
+        updatedTour = await Tour.findOneAndUpdate({ date },
+          {
+            $push: { users: user },
+            isFull,
+          },
+          { new: true });
+
+        res.status(200);
+        res.json({
+          code: 'successful booking',
+          tour: updatedTour,
+          payment: charge,
+        });
+      } else {
+        res.status(401);
+        res.json({
+          code: 'Not enough seats left',
+          foundTour,
         });
       }
-    } else {
-      console.log('CHARGE failed ', charge);
-    }
+    } else if (FULL_CAPACITY >= numberOfTickets) {
+      const { token } = req.body;
+      console.log('token back end', token);
+      const charge = await stripe.charges.create({
+        amount: 999,
+        currency: 'eur',
+        description: 'Example charge',
+        source: 'tok_cvcCheckFail',
+      });
 
-    res.status(200);
-    res.json({
-      code: 'successful booking',
-      tour: updatedTour || createdTour,
-    });
+      const isFull = numberOfTickets >= FULL_CAPACITY;
+      createdTour = await Tour.create({
+        date,
+        users: [{
+          buyer,
+          numberOfTickets,
+        }],
+        places,
+        price,
+        isFull,
+      });
+
+      res.status(200);
+      res.json({
+        code: 'successful booking',
+        tour: createdTour,
+        payment: charge,
+      });
+    }
   } catch (error) {
     if (error.type === 'StripeCardError') {
       res.status(401);
