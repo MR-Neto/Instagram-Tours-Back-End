@@ -11,28 +11,58 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true })
     console.log('deleted');
     const places = [
       {
+        index: 0,
         name: 'Sagrada Familia',
         location: {
           type: 'Point',
           coordinates: [2.1744, 41.4036],
         },
-        imagesURL: ['https://aws-tiqets-cdn.imgix.net/images/content/3ca6b020234e47448d46547ff3ac6b3f.jpg?auto=format&fit=crop&ixlib=python-1.1.2&q=25&s=434230a6bbd198e7be30fa3c234e13bd&w=400&h=320&dpr=2.625'],
+        imagesURL: ['https://images.unsplash.com/photo-1503306488045-e91a3faca799?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80'],
       },
       {
+        index: 1,
         name: 'Bunkers',
         location: {
           type: 'Point',
           coordinates: [2.1619, 41.4194],
         },
-        imagesURL: ['https://t1.salir.ltmcdn.com/es/places/8/0/8/img_127808_bunkers-del-carmel_0_600.jpg'],
+        imagesURL: ['https://images.unsplash.com/photo-1516982595895-5a78ae962b15?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=975&q=80'],
       },
       {
+        index: 2,
         name: 'Arc Triomf',
         location: {
           type: 'Point',
           coordinates: [2.1806, 41.3911],
         },
-        imagesURL: ['https://upload.wikimedia.org/wikipedia/commons/3/3f/Arc_Triomf_31-10-13.JPG'],
+        imagesURL: ['https://images.unsplash.com/photo-1486591913781-4bee9ed65bfe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80'],
+      },
+      {
+        index: 3,
+        name: 'Pedrera',
+        location: {
+          type: 'Point',
+          coordinates: [2.1620, 41.3954],
+        },
+        imagesURL: ['https://images.unsplash.com/photo-1528744598421-b7b93e12df15?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=80'],
+      },
+      {
+        index: 4,
+        name: 'Parc Guell',
+        location: {
+          type: 'Point',
+          coordinates: [2.1527, 41.4145],
+        },
+        imagesURL: ['https://images.unsplash.com/photo-1544918877-460635b6d13e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1655&q=80'],
+      },
+      {
+        index: 5,
+        name: 'Tibidabo',
+        location: {
+          type: 'Point',
+          coordinates: [2.1186, 41.4225],
+        },
+        imagesURL: ['https://images.unsplash.com/photo-1511527661048-7fe73d85e9a4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=802&q=80'],
       },
     ];
 

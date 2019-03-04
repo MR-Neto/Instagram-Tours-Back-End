@@ -2,8 +2,11 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-
 const placeSchema = new Schema({
+  index: {
+    type: Number,
+    required: true,
+  },
   name: {
     type: String,
     required: true,
