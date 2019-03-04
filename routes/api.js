@@ -135,10 +135,11 @@ router.get('/:id/bookedtours', async (req, res, next) => {
 router.get('/places', (req, res, next) => {
   const { id } = req.query;
   if (id) {
-    Place.findById(id)
-      .then((place) => {
+    const parsedId = JSON.parse(id);
+    Place.find({ _id: { $in: parsedId } })
+      .then((places) => {
         res.status(200);
-        res.json(place);
+        res.json(places);
       })
       .catch(next);
   } else {
