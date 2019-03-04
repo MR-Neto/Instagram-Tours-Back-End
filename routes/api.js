@@ -134,7 +134,7 @@ router.get('/:id/bookedtours', async (req, res, next) => {
 
 router.get('/places', (req, res, next) => {
   const { id } = req.query;
-  if(id) {
+  if (id) {
     Place.findById(id)
       .then((place) => {
         res.status(200);
