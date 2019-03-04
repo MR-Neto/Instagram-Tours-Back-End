@@ -20,7 +20,7 @@ router.get('/me', (req, res, next) => {
 router.post('/login', (req, res, next) => {
   if (req.session.currentUser) {
     return res.status(401).json({
-      error: 'unauthorized',
+      code: 'unauthorized',
     });
   }
 
@@ -28,7 +28,7 @@ router.post('/login', (req, res, next) => {
 
   if (!username || !password) {
     return res.status(422).json({
-      error: 'validation',
+      code: 'Empty User or Password',
     });
   }
 
@@ -36,7 +36,7 @@ router.post('/login', (req, res, next) => {
     .then((user) => {
       if (!user) {
         return res.status(404).json({
-          error: 'not-found',
+          code: 'Incorrect Username or Password',
         });
       }
       if (bcrypt.compareSync(password, user.password)) {
@@ -44,7 +44,7 @@ router.post('/login', (req, res, next) => {
         return res.status(200).json(user);
       }
       return res.status(404).json({
-        error: 'not-found',
+        code: 'Incorrect Username or Password',
       });
     })
     .catch(next);
@@ -60,7 +60,7 @@ router.post('/signup', (req, res, next) => {
 
   if (!username || !password || !name || !phoneNumber) {
     return res.status(422).json({
-      error: 'empty fields',
+      code: 'Check for empty fields',
     });
   }
 
@@ -68,7 +68,7 @@ router.post('/signup', (req, res, next) => {
     .then((userExists) => {
       if (userExists) {
         return res.status(422).json({
-          error: 'username-not-unique',
+          code: 'Unavailable username',
         });
       }
 
