@@ -133,12 +133,23 @@ router.get('/:id/bookedtours', async (req, res, next) => {
 });
 
 router.get('/places', (req, res, next) => {
-  Place.find({})
-    .then((places) => {
-      res.status(200);
-      res.json(places);
-    })
-    .catch(next);
+  const { id } = req.query;
+  if (id) {
+    const parsedId = JSON.parse(id);
+    Place.find({ _id: { $in: parsedId } })
+      .then((places) => {
+        res.status(200);
+        res.json(places);
+      })
+      .catch(next);
+  } else {
+    Place.find({})
+      .then((places) => {
+        res.status(200);
+        res.json(places);
+      })
+      .catch(next);
+  }
 });
 
 module.exports = router;
