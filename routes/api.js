@@ -1,5 +1,5 @@
 const express = require('express');
-const stripe = require('stripe')('sk_test_sHrxfQkR33g4YZQOoSNkbLEf');
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
 
 const router = express.Router();
 const Tour = require('../models/tour');
@@ -32,18 +32,12 @@ router.post('/book', async (req, res, next) => {
         .reduce((acc, currentUser) => acc + Number(currentUser.numberOfTickets), 0);
       const isFull = availableSeats - numberOfTickets <= 0;
       if (availableSeats >= numberOfTickets) {
-        // Set your secret key: remember to change this to your live secret key in production
-        // See your keys here: https://dashboard.stripe.com/account/apikeys
-
-        // Token is created using Checkout or Elements!
-        // Get the payment token ID submitted by the form:
         const { token } = req.body;
-        console.log('token back end', token);
         const charge = await stripe.charges.create({
-          amount: 999,
+          amount: 50,
           currency: 'eur',
-          description: 'Example charge',
-          source: 'tok_cvcCheckFail',
+          description: 'Instagram Tour',
+          source: token,
         });
 
         updatedTour = await Tour.findOneAndUpdate({ date },
@@ -68,12 +62,11 @@ router.post('/book', async (req, res, next) => {
       }
     } else if (FULL_CAPACITY >= numberOfTickets) {
       const { token } = req.body;
-      console.log('token back end', token);
       const charge = await stripe.charges.create({
-        amount: 999,
+        amount: 50,
         currency: 'eur',
-        description: 'Example charge',
-        source: 'tok_cvcCheckFail',
+        description: 'Instagram Tour',
+        source: token,
       });
 
       const isFull = numberOfTickets >= FULL_CAPACITY;
