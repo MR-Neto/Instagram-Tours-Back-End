@@ -117,12 +117,13 @@ router.post('/google', async (req, res, next) => {
       });
     }
 
-    const user = await User.findOne({ username: email });
+    const user = await User.findOne({ username: email, isCreatedFromGoogle: true });
     if (!user) {
       const newUser = User({
         username: email,
         name,
         email,
+        isCreatedFromGoogle: true,
       });
       const newUserSaved = await newUser.save();
       console.log('new user saved', newUserSaved);
