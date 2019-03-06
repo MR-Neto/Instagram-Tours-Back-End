@@ -104,12 +104,8 @@ router.post('/google', async (req, res, next) => {
     });
 
     const payload = ticket.getPayload();
-    console.log('Payload email ', payload.email);
-    console.log('Payload name ', payload.name);
-
 
     const { email, name } = payload;
-
 
     if (req.session.currentUser) {
       return res.status(401).json({
@@ -126,14 +122,12 @@ router.post('/google', async (req, res, next) => {
         isCreatedFromGoogle: true,
       });
       const newUserSaved = await newUser.save();
-      console.log('new user saved', newUserSaved);
       req.session.currentUser = newUser;
       return res.status(201).json(newUser);
     }
     req.session.currentUser = user;
     return res.status(200).json(user);
   } catch (err) {
-    console.log(err);
     return err;
   }
 });
