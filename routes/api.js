@@ -5,6 +5,7 @@ const router = express.Router();
 const Tour = require('../models/tour');
 const User = require('../models/user');
 const Place = require('../models/place');
+const sendConfirmationEmail = require('../helpers/gridEmail');
 
 const FULL_CAPACITY = 4;
 const price = 25;
@@ -63,7 +64,7 @@ router.post('/book', async (req, res, next) => {
     } else if (FULL_CAPACITY >= numberOfTickets) {
       const { token } = req.body;
       const charge = await stripe.charges.create({
-        amount: 50,
+        amount: 10,
         currency: 'eur',
         description: 'Instagram Tour',
         source: token,
@@ -80,7 +81,6 @@ router.post('/book', async (req, res, next) => {
         price,
         isFull,
       });
-
       res.status(200);
       res.json({
         code: 'successful booking',
