@@ -93,6 +93,7 @@ router.post('/signup', (req, res, next) => {
 });
 
 router.post('/google', (req, res, next) => {
+  console.log("body", req.body);
   const { tokenId } = req.body;
   console.log('ReceiveToken ', tokenId);
 
