@@ -12,4 +12,5 @@ function sendConfirmationEmail(to, from, subject, text) {
   sgMail.send(msg);
 }
 
-export default sendConfirmationEmail;
+
+module.exports = sendConfirmationEmail;
