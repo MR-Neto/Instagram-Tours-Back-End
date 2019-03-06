@@ -1,5 +1,5 @@
 const express = require('express');
-const stripe = require('stripe')('sk_test_sHrxfQkR33g4YZQOoSNkbLEf');
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
 
 const router = express.Router();
 const Tour = require('../models/tour');
@@ -135,8 +135,7 @@ router.get('/:id/bookedtours', async (req, res, next) => {
 router.get('/places', (req, res, next) => {
   const { id } = req.query;
   if (id) {
-    const parsedId = JSON.parse(id);
-    Place.find({ _id: { $in: parsedId } })
+    Place.find({ _id: { $in: JSON.parse(id) } })
       .then((places) => {
         res.status(200);
         res.json(places);
