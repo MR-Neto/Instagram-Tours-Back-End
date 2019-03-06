@@ -1,4 +1,5 @@
 const express = require('express');
+const { OAuth2Client } = require('google-auth-library');
 
 const router = express.Router();
 const bcrypt = require('bcrypt');
@@ -6,6 +7,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 
 const { isLoggedIn } = require('../helpers/middlewares');
+
 
 router.get('/me', (req, res, next) => {
   if (req.session.currentUser) {
@@ -88,6 +90,32 @@ router.post('/signup', (req, res, next) => {
       });
     })
     .catch(next);
+});
+
+router.post('/google', (req, res, next) => {
+  const { tokenId } = req.body;
+  console.log('ReceiveToken ', tokenId);
+
+
+  const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+  async function verify() {
+    const ticket = await client.verifyIdToken({
+      idToken: tokenId,
+      audience: process.env.GOOGLE_CLIENT_ID,
+      // Specify the CLIENT_ID of the app that accesses the backend
+      // Or, if multiple clients access the backend:
+      //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+    });
+    console.log('Ticket ', ticket);
+
+    const payload = ticket.getPayload();
+    console.log('Payload ', payload);
+
+    const userid = payload['sub'];
+    console.log('userid ', userid);
+  }
+  verify().catch(console.error);
 });
 
 router.post('/logout', (req, res) => {
