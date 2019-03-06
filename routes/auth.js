@@ -92,31 +92,49 @@ router.post('/signup', (req, res, next) => {
     .catch(next);
 });
 
-router.post('/google', (req, res, next) => {
-  console.log("body", req.body);
-  const { tokenId } = req.body;
-  console.log('ReceiveToken ', tokenId);
+router.post('/google', async (req, res, next) => {
+  try {
+    const { tokenId } = req.body;
 
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-  const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
-  async function verify() {
     const ticket = await client.verifyIdToken({
       idToken: tokenId,
       audience: process.env.GOOGLE_CLIENT_ID,
-      // Specify the CLIENT_ID of the app that accesses the backend
-      // Or, if multiple clients access the backend:
-      //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
     });
-    console.log('Ticket ', ticket);
 
     const payload = ticket.getPayload();
-    console.log('Payload ', payload);
+    console.log('Payload email ', payload.email);
+    console.log('Payload name ', payload.name);
 
-    const userid = payload['sub'];
-    console.log('userid ', userid);
+
+    const { email, name } = payload;
+
+
+    if (req.session.currentUser) {
+      return res.status(401).json({
+        code: 'unauthorized',
+      });
+    }
+
+    const user = await User.findOne({ username: email });
+    if (!user) {
+      const newUser = User({
+        username: email,
+        name,
+        email,
+      });
+      const newUserSaved = await newUser.save();
+      console.log('new user saved', newUserSaved);
+      req.session.currentUser = newUser;
+      return res.status(201).json(newUser);
+    }
+    req.session.currentUser = user;
+    return res.status(200).json(user);
+  } catch (err) {
+    console.log(err);
+    return err;
   }
-  verify().catch(console.error);
 });
 
 router.post('/logout', (req, res) => {

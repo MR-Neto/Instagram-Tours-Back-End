@@ -10,7 +10,6 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
   },
   name: {
     type: String,
@@ -18,7 +17,13 @@ const userSchema = new Schema({
   },
   phoneNumber: {
     type: String,
-    required: true,
+  },
+  email: {
+    type: String,
+  },
+  isCreatedFromGoogle: {
+    type: Boolean,
+    default: false,
   },
 }, {
   timestamps: {
