@@ -1,10 +1,11 @@
 const express = require('express');
-const stripe = require('stripe')('sk_test_sHrxfQkR33g4YZQOoSNkbLEf');
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
 
 const router = express.Router();
 const Tour = require('../models/tour');
 const User = require('../models/user');
 const Place = require('../models/place');
+const sendConfirmationEmail = require('../helpers/gridEmail');
 
 const FULL_CAPACITY = 4;
 const price = 25;
@@ -32,18 +33,12 @@ router.post('/book', async (req, res, next) => {
         .reduce((acc, currentUser) => acc + Number(currentUser.numberOfTickets), 0);
       const isFull = availableSeats - numberOfTickets <= 0;
       if (availableSeats >= numberOfTickets) {
-        // Set your secret key: remember to change this to your live secret key in production
-        // See your keys here: https://dashboard.stripe.com/account/apikeys
-
-        // Token is created using Checkout or Elements!
-        // Get the payment token ID submitted by the form:
         const { token } = req.body;
-        console.log('token back end', token);
         const charge = await stripe.charges.create({
-          amount: 999,
+          amount: 1000,
           currency: 'eur',
-          description: 'Example charge',
-          source: 'tok_cvcCheckFail',
+          description: 'Instagram Tour',
+          source: token,
         });
 
         updatedTour = await Tour.findOneAndUpdate({ date },
@@ -68,12 +63,11 @@ router.post('/book', async (req, res, next) => {
       }
     } else if (FULL_CAPACITY >= numberOfTickets) {
       const { token } = req.body;
-      console.log('token back end', token);
       const charge = await stripe.charges.create({
-        amount: 999,
+        amount: 1000,
         currency: 'eur',
-        description: 'Example charge',
-        source: 'tok_cvcCheckFail',
+        description: 'Instagram Tour',
+        source: token,
       });
 
       const isFull = numberOfTickets >= FULL_CAPACITY;
@@ -87,7 +81,6 @@ router.post('/book', async (req, res, next) => {
         price,
         isFull,
       });
-
       res.status(200);
       res.json({
         code: 'successful booking',
@@ -135,8 +128,7 @@ router.get('/:id/bookedtours', async (req, res, next) => {
 router.get('/places', (req, res, next) => {
   const { id } = req.query;
   if (id) {
-    const parsedId = JSON.parse(id);
-    Place.find({ _id: { $in: parsedId } })
+    Place.find({ _id: { $in: JSON.parse(id) } })
       .then((places) => {
         res.status(200);
         res.json(places);
