@@ -35,7 +35,7 @@ router.post('/book', async (req, res, next) => {
       if (availableSeats >= numberOfTickets) {
         const { token } = req.body;
         const charge = await stripe.charges.create({
-          amount: 10,
+          amount: 1000,
           currency: 'eur',
           description: 'Instagram Tour',
           source: token,
@@ -64,7 +64,7 @@ router.post('/book', async (req, res, next) => {
     } else if (FULL_CAPACITY >= numberOfTickets) {
       const { token } = req.body;
       const charge = await stripe.charges.create({
-        amount: 10,
+        amount: 1000,
         currency: 'eur',
         description: 'Instagram Tour',
         source: token,
