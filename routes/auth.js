@@ -105,7 +105,7 @@ router.post('/google', async (req, res, next) => {
 
     const payload = ticket.getPayload();
 
-    const { email, name } = payload;
+    const { email, name, imageURL } = payload;
 
     if (req.session.currentUser) {
       return res.status(401).json({
@@ -119,6 +119,7 @@ router.post('/google', async (req, res, next) => {
         username: email,
         name,
         email,
+        imageURL,
         isCreatedFromGoogle: true,
       });
       const newUserSaved = await newUser.save();

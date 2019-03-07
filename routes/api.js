@@ -104,7 +104,7 @@ router.get('/:id/bookedtours', async (req, res, next) => {
   try {
     const foundUser = await User.findById(id);
     if (foundUser) {
-      const tours = await Tour.find({ users: { $elemMatch: { buyer: id } } });
+      const tours = await Tour.find({ users: { $elemMatch: { buyer: id } } }).populate('places');
       if (tours) {
         res.status(200);
         res.json(tours);
