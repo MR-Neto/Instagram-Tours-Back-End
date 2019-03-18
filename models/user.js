@@ -21,6 +21,9 @@ const userSchema = new Schema({
   email: {
     type: String,
   },
+  imageURL: {
+    type: String,
+  },
   isCreatedFromGoogle: {
     type: Boolean,
     default: false,
