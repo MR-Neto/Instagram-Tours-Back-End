@@ -6,6 +6,7 @@ const Tour = require('../models/tour');
 const User = require('../models/user');
 const Place = require('../models/place');
 const sendConfirmationEmail = require('../helpers/gridEmail');
+const makePayment = require('../helpers/stripe');
 
 const FULL_CAPACITY = 4;
 const price = 25;
@@ -34,13 +35,7 @@ router.post('/book', async (req, res, next) => {
       const isFull = availableSeats - numberOfTickets <= 0;
       if (availableSeats >= numberOfTickets) {
         const { token } = req.body;
-        const charge = await stripe.charges.create({
-          amount: 1000,
-          currency: 'eur',
-          description: 'Instagram Tour',
-          source: token,
-        });
-
+        const charge = await makePayment(1000, token);
         updatedTour = await Tour.findOneAndUpdate({ date },
           {
             $push: { users: user },
@@ -63,13 +58,7 @@ router.post('/book', async (req, res, next) => {
       }
     } else if (FULL_CAPACITY >= numberOfTickets) {
       const { token } = req.body;
-      const charge = await stripe.charges.create({
-        amount: 1000,
-        currency: 'eur',
-        description: 'Instagram Tour',
-        source: token,
-      });
-
+      const charge = await makePayment(1000, token);
       const isFull = numberOfTickets >= FULL_CAPACITY;
       createdTour = await Tour.create({
         date,
