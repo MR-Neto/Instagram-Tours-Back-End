@@ -6,9 +6,6 @@ const bcrypt = require('bcrypt');
 
 const User = require('../models/user');
 
-const { isLoggedIn } = require('../helpers/middlewares');
-const sendConfirmationEmail = require('../helpers/gridEmail');
-
 router.get('/me', (req, res, next) => {
   if (req.session.currentUser) {
     res.json(req.session.currentUser);
@@ -122,12 +119,8 @@ router.post('/google', async (req, res, next) => {
         imageURL,
         isCreatedFromGoogle: true,
       });
-      const newUserSaved = await newUser.save();
+      await newUser.save();
       req.session.currentUser = newUser;
-      sendConfirmationEmail(newUserSaved.email,
-        'miguelribeironeto@gmail.com',
-        'YOU JUST BOOKED A TOUR FOR',
-        'Thanks for your booking. Your payment was successful');
       return res.status(201).json(newUser);
     }
     req.session.currentUser = user;
@@ -140,12 +133,6 @@ router.post('/google', async (req, res, next) => {
 router.post('/logout', (req, res) => {
   req.session.destroy();
   return res.status(204).send();
-});
-
-router.get('/private', isLoggedIn(), (req, res, next) => {
-  res.status(200).json({
-    message: 'This is a private message',
-  });
 });
 
 module.exports = router;
