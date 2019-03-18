@@ -1,15 +1,13 @@
 const express = require('express');
-const stripe = require('stripe')(process.env.STRIPE_SECRET);
 
 const router = express.Router();
 const Tour = require('../models/tour');
 const User = require('../models/user');
 const Place = require('../models/place');
-const sendConfirmationEmail = require('../helpers/gridEmail');
-const makePayment = require('../helpers/stripe');
+const bookingAssistant = require('../helpers/booking');
 
 const FULL_CAPACITY = 4;
-const price = 25;
+const price = 1000;
 
 router.get('/tours', (req, res, next) => {
   Tour.find({})
@@ -21,69 +19,29 @@ router.get('/tours', (req, res, next) => {
 });
 
 router.post('/book', async (req, res, next) => {
-  const { date, user, places } = req.body.details;
-  const { buyer, numberOfTickets } = user;
-  let updatedTour;
-  let createdTour;
+  const { date, user } = req.body.details;
+  const { numberOfTickets } = user;
 
   try {
     const foundTour = await Tour.find({ date }).populate('users.buyer');
+    let response;
     if (foundTour.length > 0) {
-      const availableSeats = FULL_CAPACITY - foundTour[0]
-        .users
-        .reduce((acc, currentUser) => acc + Number(currentUser.numberOfTickets), 0);
-      const isFull = availableSeats - numberOfTickets <= 0;
-      if (availableSeats >= numberOfTickets) {
-        const { token } = req.body;
-        const charge = await makePayment(1000, token);
-        updatedTour = await Tour.findOneAndUpdate({ date },
-          {
-            $push: { users: user },
-            isFull,
-          },
-          { new: true });
-
-        res.status(200);
-        res.json({
-          code: 'successful booking',
-          tour: updatedTour,
-          payment: charge,
-        });
-      } else {
-        res.status(401);
-        res.json({
-          code: 'Not enough seats left',
-          foundTour,
-        });
-      }
-    } else if (FULL_CAPACITY >= numberOfTickets) {
-      const { token } = req.body;
-      const charge = await makePayment(1000, token);
-      const isFull = numberOfTickets >= FULL_CAPACITY;
-      createdTour = await Tour.create({
-        date,
-        users: [{
-          buyer,
-          numberOfTickets,
-        }],
-        places,
+      response = await bookingAssistant.updateExistingTour(
+        foundTour,
+        req.body,
         price,
-        isFull,
-      });
-      res.status(200);
-      res.json({
-        code: 'successful booking',
-        tour: createdTour,
-        payment: charge,
-      });
+      );
+    } else if (FULL_CAPACITY >= numberOfTickets) {
+      response = await bookingAssistant.createNewTour(req.body, price);
     }
-  } catch (error) {
-    if (error.type === 'StripeCardError') {
+    if (response.type === 'StripeCardError') {
       res.status(401);
       res.json({ code: 'payment unsuccessful' });
-    } else {
-      next(error);
     }
+    res.status(response.status);
+    res.json(response.json);
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -93,20 +51,22 @@ router.get('/:id/bookedtours', async (req, res, next) => {
   try {
     const foundUser = await User.findById(id);
     if (foundUser) {
-      const tours = await Tour.find({ users: { $elemMatch: { buyer: id } } }).populate('places');
+      const tours = await Tour.find({
+        users: { $elemMatch: { buyer: id } }
+      }).populate('places');
       if (tours) {
         res.status(200);
         res.json(tours);
       } else {
         res.status(204);
         res.json({
-          message: 'no tours found',
+          message: 'no tours found'
         });
       }
     } else {
       res.status(404);
       res.json({
-        message: 'no users found',
+        message: 'no users found'
       });
     }
   } catch (error) {
@@ -118,14 +78,14 @@ router.get('/places', (req, res, next) => {
   const { id } = req.query;
   if (id) {
     Place.find({ _id: { $in: JSON.parse(id) } })
-      .then((places) => {
+      .then(places => {
         res.status(200);
         res.json(places);
       })
       .catch(next);
   } else {
     Place.find({})
-      .then((places) => {
+      .then(places => {
         res.status(200);
         res.json(places);
       })
